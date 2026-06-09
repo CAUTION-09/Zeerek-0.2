@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeerek - Билим берүү платформасы</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .conveyor-track {
+            display: flex;
+            gap: 2rem;
+            animation: scroll 30s linear infinite;
+            width: max-content;
+        }
+
+        .conveyor-track:hover { animation-play-state: paused; }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .class-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .class-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .book-card {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .book-card:hover {
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .search-expand {
+            width: 0;
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .search-expand.active {
+            width: 300px;
+            opacity: 1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .book-3d { perspective: 1000px; }
+
+        .book-inner {
+            transition: transform 0.5s;
+            transform-style: preserve-3d;
+        }
+
+        .book-card:hover .book-inner {
+            transform: rotateY(-10deg);
+        }
+
+        .auth-form input, .auth-form select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .auth-form input:focus, .auth-form select:focus {
+            border-color: #818cf8;
+            background: rgba(255, 255, 255, 0.15);
+            outline: none;
+        }
+
+        .auth-form input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .role-teacher {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .role-student {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .role-admin {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .teacher-panel {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .student-panel {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .admin-panel {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1));
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+        }
+
+        .dashboard-card {
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .stat-number {
+            background: linear-gradient(135deg, #fff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            transform: translateX(120%);
+            transition: transform 0.4s ease;
+        }
+
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+
+        .modal-box {
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .json-viewer {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            overflow: auto;
+            max-height: 400px;
+        }
+
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
+        .json-boolean { color: #569cd6; }
+        .json-null { color: #569cd6; }
+
+        .table-row:hover {
+            background: rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body class="text-white overflow-x-hidden">
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification-toast glass-dark rounded-xl p-4 shadow-2xl max-w-sm">
+        <div class="flex items-center gap-3">
+            <div id="notifIcon" class="w-8 h-8 rounded-full flex items-center justify-center"></div>
+            <div>
+                <p id="notifTitle" class="font-semibold text-sm"></p>
+                <p id="notifMessage" class="text-xs text-white/60"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Particles -->
+    <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-dark px-4 py-3 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform">
+                    <i class="fas fa-graduation-cap text-white text-lg"></i>
+                </div>
+                <span class="text-2xl font-bold bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-transparent">Zeerek</span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-4">
+                <div class="relative flex items-center">
+                    <button onclick="toggleSearch()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                        <i class="fas fa-search text-lg"></i>
+                    </button>
+                    <input type="text" id="searchInput" placeholder="Контент издөө..." 
+                           class="search-expand bg-white/10 border border-white/20 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-indigo-400 placeholder-white/50">
+                </div>
+
+                <button onclick="toggleMap()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/20 hover:border-indigo-400">
+                    <i class="fas fa-map-marker-alt text-indigo-300"></i>
+                    <span class="text-sm font-medium">Карта</span>
+                </button>
+
+                <button id="dashboardBtn" onclick="showDashboard()" class="hidden flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/20 hover:border-indigo-400">
+                    <i class="fas fa-th-large text-indigo-300"></i>
+                    <span class="text-sm font-medium">Панель</span>
+                </button>
+
+                <button id="adminBtn" onclick="showAdminPanel()" class="hidden flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/20 hover:bg-red-500/30 transition-all border border-red-500/30 hover:border-red-400">
+                    <i class="fas fa-database text-red-300"></i>
+                    <span class="text-sm font-medium">База</span>
+                </button>
+
+                <div class="relative" id="userMenu">
+                    <button onclick="toggleUserMenu()" id="userMenuBtn" class="flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-white/20 hover:border-indigo-400 transition-all">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
+                            <i class="fas fa-user text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium hidden lg:block" id="userMenuText">Кирүү</span>
+                    </button>
+                    
+                    <div id="userDropdown" class="absolute right-0 mt-2 w-72 glass-dark rounded-2xl p-4 opacity-0 invisible transform translate-y-2 transition-all duration-300 shadow-2xl">
+                        <div id="guestView">
+                            <div class="text-center mb-4">
+                                <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center mb-2">
+                                    <i class="fas fa-user text-2xl"></i>
+                                </div>
+                                <h3 class="font-semibold">Конок</h3>
+                                <p class="text-xs text-white/60">Системага кирүү керек</p>
+                            </div>
+                            <button onclick="showAuthModal('login')" class="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg text-sm font-medium hover:shadow-lg transition-all mb-2">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Кирүү
+                            </button>
+                            <button onclick="showAuthModal('register')" class="w-full py-2.5 border border-white/20 rounded-lg text-sm hover:bg-white/10 transition-all">
+                                <i class="fas fa-user-plus mr-2"></i>Катталуу
+                            </button>
+                        </div>
+
+                        <div id="loggedInView" class="hidden">
+                            <div class="text-center mb-4">
+                                <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center mb-2 relative">
+                                    <i class="fas fa-user text-2xl"></i>
+                                    <div id="userRoleBadgeNav" class="absolute -bottom-1 -right-1"></div>
+                                </div>
+                                <h3 class="font-semibold" id="userName">Аты</h3>
+                                <p class="text-xs text-white/60" id="userEmail">email@example.com</p>
+                                <div id="userRoleDisplay" class="mt-2"></div>
+                            </div>
+                            <div class="space-y-2">
+                                <button onclick="showDashboard()" class="w-full py-2.5 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-all text-left px-4">
+                                    <i class="fas fa-th-large mr-2 text-indigo-400"></i>Менин панелим
+                                </button>
+                                <button onclick="showProfile()" class="w-full py-2.5 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-all text-left px-4">
+                                    <i class="fas fa-user-cog mr-2 text-indigo-400"></i>Профиль
+                                </button>
+                                <button id="dropdownAdminBtn" onclick="showAdminPanel()" class="hidden w-full py-2.5 bg-red-500/20 rounded-lg text-sm hover:bg-red-500/30 transition-all text-left px-4 text-red-300">
+                                    <i class="fas fa-database mr-2 text-red-400"></i>Базаны көрүү
+                                </button>
+                                <button onclick="logout()" class="w-full py-2.5 bg-red-500/20 border border-red-500/30 rounded-lg text-sm hover:bg-red-500/30 transition-all text-left px-4 text-red-300">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Чыгуу
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="md:hidden p-2" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="fixed inset-0 z-40 glass-dark transform translate-x-full transition-transform duration-300 md:hidden">
+        <div class="p-6 pt-20">
+            <button onclick="toggleMobileMenu()" class="absolute top-4 right-4 p-2">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <div class="space-y-4">
+                <input type="text" placeholder="Издөө..." class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3">
+                <button onclick="toggleMap(); toggleMobileMenu()" class="w-full flex items-center gap-3 p-3 rounded-lg bg-white/10">
+                    <i class="fas fa-map"></i> Карта
+                </button>
+                <button id="mobileDashboardBtn" onclick="showDashboard(); toggleMobileMenu()" class="hidden w-full flex items-center gap-3 p-3 rounded-lg bg-white/10">
+                    <i class="fas fa-th-large"></i> Панель
+                </button>
+                <div id="mobileAuthSection">
+                    <button onclick="showAuthModal('login'); toggleMobileMenu()" class="w-full p-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600">
+                        <i class="fas fa-sign-in-alt mr-2"></i> Кирүү
+                    </button>
+                    <button onclick="showAuthModal('register'); toggleMobileMenu()" class="w-full p-3 mt-2 rounded-lg border border-white/20">
+                        <i class="fas fa-user-plus mr-2"></i> Катталуу
+                    </button>
+                </div>
+                <div id="mobileLoggedInSection" class="hidden space-y-2">
+                    <div class="p-4 bg-white/5 rounded-lg text-center">
+                        <div id="mobileUserRoleBadge" class="mb-2"></div>
+                        <p class="font-semibold" id="mobileUserName">Аты</p>
+                        <p class="text-xs text-white/60" id="mobileUserEmail">email</p>
+                    </div>
+                    <button onclick="showDashboard(); toggleMobileMenu()" class="w-full p-3 rounded-lg bg-white/10 text-left">
+                        <i class="fas fa-th-large mr-2"></i> Панель
+                    </button>
+                    <button onclick="logout(); toggleMobileMenu()" class="w-full p-3 rounded-lg bg-red-500/20 text-red-300 text-left">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Чыгуу
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="modal-box glass-dark rounded-3xl w-full max-w-md overflow-hidden shadow-2xl" id="authContent">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold" id="authTitle">Катталуу</h3>
+                    <button onclick="closeAuthModal()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="flex gap-2 mb-6 p-1 bg-white/5 rounded-xl">
+                    <button onclick="switchAuthTab('login')" id="loginTab" class="flex-1 py-2 rounded-lg text-sm font-medium transition-all bg-white/10">
+                        Кирүү
+                    </button>
+                    <button onclick="switchAuthTab('register')" id="registerTab" class="flex-1 py-2 rounded-lg text-sm font-medium transition-all bg-indigo-500 text-white">
+                        Катталуу
+                    </button>
+                </div>
+
+                <form id="loginForm" class="auth-form hidden space-y-4" onsubmit="return doLogin(event)">
+                    <div>
+                        <label class="block text-sm text-white/70 mb-1">Email</label>
+                        <input type="email" id="loginEmail" required class="w-full rounded-lg px-4 py-3" placeholder="email@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-white/70 mb-1">Сырсөз</label>
+                        <input type="password" id="loginPassword" required class="w-full rounded-lg px-4 py-3" placeholder="Сырсөзүңүз">
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" class="rounded bg-white/10 border-white/20">
+                            <span class="text-white/60">Эстеп калуу</span>
+                        </label>
+                        <a href="#" class="text-indigo-400 hover:text-indigo-300">Унуттуңузбу?</a>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg font-semibold hover:shadow-lg transition-all">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Кирүү
+                    </button>
+                </form>
+
+                <form id="registerForm" class="auth-form space-y-4" onsubmit="return doRegister(event)">
+                    <div>
+                        <label class="block text-sm text-white/70 mb-1">Толук аты-жөнү *</label>
+                        <input type="text" id="regName" required class="w-full rounded-lg px-4 py-3" placeholder="Аты Жөнү">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-white/70 mb-1">Email *</label>
+                        <input type="email" id="regEmail" required class="w-full rounded-lg px-4 py-3" placeholder="email@example.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-white/70 mb-1">Сырсөз *</label>
+                        <input type="password" id="regPassword" required minlength="6" class="w-full rounded-lg px-4 py-3" placeholder="6 белгиден көбүрөөк">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-white/70 mb-1">Сырсөздү ыраста *</label>
+                        <input type="password" id="regConfirmPassword" required class="w-full rounded-lg px-4 py-3" placeholder="Сырсөздү кайталоо">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-white/70 mb-2">Ролуңузду тандаңыз *</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="role" value="student" class="peer hidden" checked>
+                                <div class="p-3 rounded-lg border border-white/20 bg-white/5 peer-checked:border-green-500 peer-checked:bg-green-500/20 transition-all text-center">
+                                    <i class="fas fa-user-graduate text-2xl mb-1 text-green-400"></i>
+                                    <p class="text-sm font-medium">Окуучу</p>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="role" value="teacher" class="peer hidden">
+                                <div class="p-3 rounded-lg border border-white/20 bg-white/5 peer-checked:border-amber-500 peer-checked:bg-amber-500/20 transition-all text-center">
+                                    <i class="fas fa-chalkboard-teacher text-2xl mb-1 text-amber-400"></i>
+                                    <p class="text-sm font-medium">Мугалим</p>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="role" value="admin" class="peer hidden">
+                                <div class="p-3 rounded-lg border border-white/20 bg-white/5 peer-checked:border-red-500 peer-checked:bg-red-500/20 transition-all text-center">
+                                    <i class="fas fa-shield-alt text-2xl mb-1 text-red-400"></i>
+                                    <p class="text-sm font-medium">Админ</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-white/70 mb-1">Класс (опционалдуу)</label>
+                        <select id="regClass" class="w-full rounded-lg px-4 py-3 bg-white/10 border border-white/20 text-white focus:outline-none focus:border-indigo-400">
+                            <option value="" class="bg-slate-800">Тандоо...</option>
+                            <option value="1" class="bg-slate-800">1-класс</option>
+                            <option value="2" class="bg-slate-800">2-класс</option>
+                            <option value="3" class="bg-slate-800">3-класс</option>
+                            <option value="4" class="bg-slate-800">4-класс</option>
+                            <option value="5" class="bg-slate-800">5-класс</option>
+                            <option value="6" class="bg-slate-800">6-класс</option>
+                            <option value="7" class="bg-slate-800">7-класс</option>
+                            <option value="8" class="bg-slate-800">8-класс</option>
+                            <option value="9" class="bg-slate-800">9-класс</option>
+                            <option value="10" class="bg-slate-800">10-класс</option>
+                            <option value="11" class="bg-slate-800">11-класс</option>
+                        </select>
+                    </div>
+                    <div class="flex items-start gap-2 text-sm">
+                        <input type="checkbox" id="agreeTerms" required class="mt-1 rounded bg-white/10 border-white/20">
+                        <label for="agreeTerms" class="text-white/60">Мен <a href="#" class="text-indigo-400">колдонуу шарттарын</a> кабыл алам</label>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg font-semibold hover:shadow-lg transition-all">
+                        <i class="fas fa-user-plus mr-2"></i>Катталуу
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Modal -->
+    <div id="dashboardModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+        <div class="modal-box glass-dark rounded-3xl w-full max-w-5xl overflow-hidden shadow-2xl my-8" id="dashboardContent">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-th-large text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">Башкаруу панели</h3>
+                        <div id="dashboardRoleBadge"></div>
+                    </div>
+                </div>
+                <button onclick="closeDashboard()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6" id="dashboardBody"></div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="modal-box glass-dark rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl" id="profileContent">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                <h3 class="text-lg font-semibold">Профиль</h3>
+                <button onclick="closeProfile()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6" id="profileBody"></div>
+        </div>
+    </div>
+
+    <!-- Admin/JSON Database Modal -->
+    <div id="adminModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+        <div class="modal-box glass-dark rounded-3xl w-full max-w-6xl overflow-hidden shadow-2xl my-8" id="adminContent">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
+                        <i class="fas fa-database text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">JSON База Башкаруу</h3>
+                        <p class="text-xs text-white/60">Бардык маалыматтар localStorage'та сакталат</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="exportAllData()" class="px-3 py-2 bg-green-500/20 border border-green-500/30 rounded-lg text-sm hover:bg-green-500/30 transition-all text-green-300">
+                        <i class="fas fa-download mr-1"></i>Экспорт
+                    </button>
+                    <button onclick="importDataPrompt()" class="px-3 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg text-sm hover:bg-blue-500/30 transition-all text-blue-300">
+                        <i class="fas fa-upload mr-1"></i>Импорт
+                    </button>
+                    <button onclick="closeAdminPanel()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="flex gap-2 mb-6 p-1 bg-white/5 rounded-xl overflow-x-auto">
+                    <button onclick="switchDbTab('users')" id="dbTab-users" class="db-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-indigo-500 text-white whitespace-nowrap">
+                        <i class="fas fa-users mr-1"></i>Колдонуучулар
+                    </button>
+                    <button onclick="switchDbTab('classes')" id="dbTab-classes" class="db-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white/10 whitespace-nowrap">
+                        <i class="fas fa-school mr-1"></i>Класстар
+                    </button>
+                    <button onclick="switchDbTab('books')" id="dbTab-books" class="db-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white/10 whitespace-nowrap">
+                        <i class="fas fa-book mr-1"></i>Китептер
+                    </button>
+                    <button onclick="switchDbTab('grades')" id="dbTab-grades" class="db-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white/10 whitespace-nowrap">
+                        <i class="fas fa-chart-line mr-1"></i>Баалар
+                    </button>
+                    <button onclick="switchDbTab('homework')" id="dbTab-homework" class="db-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white/10 whitespace-nowrap">
+                        <i class="fas fa-tasks mr-1"></i>Тапшырмалар
+                    </button>
+                    <button onclick="switchDbTab('schedule')" id="dbTab-schedule" class="db-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white/10 whitespace-nowrap">
+                        <i class="fas fa-calendar mr-1"></i>График
+                    </button>
+                    <button onclick="switchDbTab('json')" id="dbTab-json" class="db-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white/10 whitespace-nowrap">
+                        <i class="fas fa-code mr-1"></i>JSON
+                    </button>
+                </div>
+                <div id="dbContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div id="mapModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="modal-box glass-dark rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl" id="mapContent">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center">
+                <h3 class="text-lg font-semibold flex items-center gap-2">
+                    <i class="fas fa-map-marked-alt text-indigo-400"></i>
+                    Окуу борборлорунун картасы
+                </h3>
+                <button onclick="toggleMap()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="relative h-96 bg-slate-800">
+                <canvas id="mapCanvas" class="w-full h-full"></canvas>
+                <div class="absolute bottom-4 left-4 glass px-4 py-2 rounded-lg text-sm">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                        <span>Окуу борборлору</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+                        <span>Китепканалар</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 px-4 z-10">
+        <div class="max-w-7xl mx-auto text-center">
+            <div id="heroWelcome" class="hidden mb-6">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-4">
+                    <i class="fas fa-hand-sparkles text-yellow-400"></i>
+                    <span class="text-sm">Кайра кош келдиңиз, <span id="heroUserName" class="font-semibold"></span>!</span>
+                    <span id="heroRoleBadge" class="ml-2"></span>
+                </div>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-indigo-200 to-purple-200 bg-clip-text text-transparent leading-tight">
+                Билим — <br>
+                <span class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">келечектин ачкычы</span>
+            </h1>
+            <p class="text-xl text-white/70 max-w-2xl mx-auto mb-8">
+                Zeerek платформасында JSON база, класстар, китепкана жана интерактивдүү карталар
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <button onclick="scrollToSection('classes')" class="px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full font-semibold shadow-lg hover:shadow-indigo-500/50 transform hover:scale-105 transition-all">
+                    Класстарды көрүү
+                </button>
+                <button onclick="scrollToSection('library')" class="px-8 py-4 glass rounded-full font-semibold hover:bg-white/20 transition-all">
+                    Китепкана
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Role Banner -->
+    <section id="roleBanner" class="hidden py-4 px-4 z-10 relative">
+        <div class="max-w-7xl mx-auto">
+            <div id="roleBannerContent" class="rounded-2xl p-4 flex items-center justify-between"></div>
+        </div>
+    </section>
+
+    <!-- Classes Section -->
+    <section id="classes" class="py-20 relative overflow-hidden z-10">
+        <div class="max-w-7xl mx-auto px-4 mb-12">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold mb-2">Класстар</h2>
+                    <p class="text-white/60">Бардык класстарды караңыз</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="pauseConveyor()" id="pauseBtn" class="p-3 glass rounded-full hover:bg-white/20 transition-all">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                    <button onclick="scrollToSection('library')" class="p-3 glass rounded-full hover:bg-white/20 transition-all">
+                        <i class="fas fa-arrow-down"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="relative">
+            <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#667eea] to-transparent z-10 pointer-events-none"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#764ba2] to-transparent z-10 pointer-events-none"></div>
+            <div class="overflow-hidden">
+                <div class="conveyor-track" id="conveyor"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Library Section -->
+    <section id="library" class="py-20 relative z-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="glass rounded-3xl p-8 md:p-12">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-2">Китепкана</h2>
+                        <p class="text-white/60">Санариптик китептердин жыйындысы</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterBooks('all')" class="tab-btn active px-4 py-2 rounded-full text-sm font-medium transition-all" data-category="all">Бардыгы</button>
+                        <button onclick="filterBooks('quran')" class="tab-btn px-4 py-2 rounded-full text-sm font-medium transition-all bg-white/10 hover:bg-white/20" data-category="quran">Куран</button>
+                        <button onclick="filterBooks('science')" class="tab-btn px-4 py-2 rounded-full text-sm font-medium transition-all bg-white/10 hover:bg-white/20" data-category="science">Илимий</button>
+                        <button onclick="filterBooks('literature')" class="tab-btn px-4 py-2 rounded-full text-sm font-medium transition-all bg-white/10 hover:bg-white/20" data-category="literature">Көркөм адабият</button>
+                        <button onclick="filterBooks('education')" class="tab-btn px-4 py-2 rounded-full text-sm font-medium transition-all bg-white/10 hover:bg-white/20" data-category="education">Окуу куралдары</button>
+                    </div>
+                </div>
+                <div class="mb-8 relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40"></i>
+                    <input type="text" id="bookSearch" placeholder="Китеп издөө (аталышы, автору...)" 
+                           class="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:border-indigo-400 transition-colors"
+                           oninput="searchBooks(this.value)">
+                </div>
+                <div id="booksGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+                <div id="emptyState" class="hidden text-center py-12">
+                    <i class="fas fa-book-open text-6xl text-white/20 mb-4"></i>
+                    <p class="text-white/60">Китептер табылган жок</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teacher Section -->
+    <section id="teacherSection" class="hidden py-20 relative z-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="teacher-panel rounded-3xl p-8 md:p-12">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center">
+                        <i class="fas fa-chalkboard-teacher text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold">Мугалимдер бөлмөсү</h2>
+                        <p class="text-white/60">Сиздин окутуу куралдарыңыз</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="dashboard-card glass-card rounded-2xl p-6 cursor-pointer" onclick="showTeacherTool('lessons')">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4"><i class="fas fa-book-reader text-blue-400 text-xl"></i></div>
+                        <h3 class="font-semibold mb-1">Сабак пландары</h3><p class="text-sm text-white/60">Сабактарды пландаштыруу</p>
+                    </div>
+                    <div class="dashboard-card glass-card rounded-2xl p-6 cursor-pointer" onclick="showTeacherTool('grades')">
+                        <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center mb-4"><i class="fas fa-chart-line text-green-400 text-xl"></i></div>
+                        <h3 class="font-semibold mb-1">Баалар журналы</h3><p class="text-sm text-white/60">Окуучулардын ийгиликтери</p>
+                    </div>
+                    <div class="dashboard-card glass-card rounded-2xl p-6 cursor-pointer" onclick="showTeacherTool('materials')">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4"><i class="fas fa-file-upload text-purple-400 text-xl"></i></div>
+                        <h3 class="font-semibold mb-1">Материалдар</h3><p class="text-sm text-white/60">Окуу материалдарын жүктөө</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Student Section -->
+    <section id="studentSection" class="hidden py-20 relative z-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="student-panel rounded-3xl p-8 md:p-12">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center">
+                        <i class="fas fa-user-graduate text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold">Окуучунун бөлмөсү</h2>
+                        <p class="text-white/60">Сиздин окуу материалдарыңыз</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="dashboard-card glass-card rounded-2xl p-6 cursor-pointer" onclick="showStudentTool('homework')">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center mb-4"><i class="fas fa-tasks text-indigo-400 text-xl"></i></div>
+                        <h3 class="font-semibold mb-1">Үй тапшырма</h3><p class="text-sm text-white/60">Аткарылуучу тапшырмалар</p>
+                    </div>
+                    <div class="dashboard-card glass-card rounded-2xl p-6 cursor-pointer" onclick="showStudentTool('progress')">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center mb-4"><i class="fas fa-trophy text-amber-400 text-xl"></i></div>
+                        <h3 class="font-semibold mb-1">Ийгиликтерим</h3><p class="text-sm text-white/60">Баалар жана жетишкендиктер</p>
+                    </div>
+                    <div class="dashboard-card glass-card rounded-2xl p-6 cursor-pointer" onclick="showStudentTool('schedule')">
+                        <div class="w-12 h-12 rounded-xl bg-rose-500/20 flex items-center justify-center mb-4"><i class="fas fa-calendar-alt text-rose-400 text-xl"></i></div>
+                        <h3 class="font-semibold mb-1">Сабактар графиги</h3><p class="text-sm text-white/60">Күнүмдүк окуу планы</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Section -->
+    <section id="adminSection" class="hidden py-20 relative z-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="admin-panel rounded-3xl p-8 md:p-12">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold">Админ бөлмөсү</h2>
+                        <p class="text-white/60">Базаны башкаруу жана көзөмөлдөө</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="dashboard-card glass-card rounded-2xl p-6 cursor-pointer" onclick="showAdminPanel()">
+                        <div class="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center mb-4"><i class="fas fa-users text-red-400 text-xl"></i></div>
+                        <h3 class="font-semibold mb-1">Колдонуучулар</h3><p class="text-sm text-white/60">Базаны көрүү жана түзөтүү</p>
+                    </div>
+                    <div class="dashboard-card glass-card rounded-2xl p-6 cursor-pointer" onclick="showAdminPanel()">
+                        <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center mb-4"><i class="fas fa-chart-bar text-orange-400 text-xl"></i></div>
+                        <h3 class="font-semibold mb-1">Статистика</h3><p class="text-sm text-white/60">Платформа статистикасы</p>
+                    </div>
+                    <div class="dashboard-card glass-card rounded-2xl p-6 cursor-pointer" onclick="showAdminPanel()">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4"><i class="fas fa-cog text-blue-400 text-xl"></i></div>
+                        <h3 class="font-semibold mb-1">Жөндөөлөр</h3><p class="text-sm text-white/60">Система жөндөөлөрү</p>
+                    </div>
+                    <div class="dashboard-card glass-card rounded-2xl p-6 cursor-pointer" onclick="exportAllData()">
+                        <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center mb-4"><i class="fas fa-download text-green-400 text-xl"></i></div>
+                        <h3 class="font-semibold mb-1">Экспорт</h3><p class="text-sm text-white/60">Базаны экспорттоо</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-12 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <div class="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-graduation-cap text-white text-sm"></i>
+                </div>
+                <span class="text-xl font-bold">Zeerek</span>
+            </div>
+            <p class="text-white/40 text-sm">© 2026 Zeerek. Бардык укуктар корголгон.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // ZEEREK JSON DATABASE SYSTEM v2.0
+        // ═══════════════════════════════════════════════════════════════
+        
+        const DB_VERSION = '2.0.0';
+        const DB_STORES = ['users', 'classes', 'books', 'grades', 'homework', 'schedule', 'settings'];
+
+        // Default data for JSON database
+        const DEFAULT_DATA = {
+            classes: [
+                { id: 1, name: '1-класс', subjects: 8, color: 'from-pink-500 to-rose-500', icon: 'fa-child', students: 28, teacher: 'А. Айтматов' },
+                { id: 2, name: '2-класс', subjects: 9, color: 'from-purple-500 to-indigo-500', icon: 'fa-shapes', students: 30, teacher: 'К. Тыныстанов' },
+                { id: 3, name: '3-класс', subjects: 10, color: 'from-indigo-500 to-blue-500', icon: 'fa-calculator', students: 25, teacher: 'М. Карагаев' },
+                { id: 4, name: '4-класс', subjects: 11, color: 'from-blue-500 to-cyan-500', icon: 'fa-book', students: 32, teacher: 'С. Жусупов' },
+                { id: 5, name: '5-класс', subjects: 12, color: 'from-cyan-500 to-teal-500', icon: 'fa-flask', students: 28, teacher: 'А. Айтматов' },
+                { id: 6, name: '6-класс', subjects: 12, color: 'from-teal-500 to-green-500', icon: 'fa-globe', students: 26, teacher: 'Б. Касымбеков' },
+                { id: 7, name: '7-класс', subjects: 14, color: 'from-green-500 to-lime-500', icon: 'fa-atom', students: 32, teacher: 'К. Тыныстанов' },
+                { id: 8, name: '8-класс', subjects: 14, color: 'from-lime-500 to-yellow-500', icon: 'fa-microscope', students: 30, teacher: 'Д. Менделеев' },
+                { id: 9, name: '9-класс', subjects: 15, color: 'from-yellow-500 to-orange-500', icon: 'fa-laptop-code', students: 25, teacher: 'Э. Эйнштейн' },
+                { id: 10, name: '10-класс', subjects: 16, color: 'from-orange-500 to-red-500', icon: 'fa-graduation-cap', students: 22, teacher: 'Н. Тесла' },
+                { id: 11, name: '11-класс', subjects: 16, color: 'from-red-500 to-pink-500', icon: 'fa-university', students: 20, teacher: 'А. Флеминг' }
+            ],
+            books: [
+                { id: 1, title: 'Куран Керим', author: 'Аллах Таала', category: 'quran', type: 'pdf', cover: 'from-emerald-600 to-teal-800', year: 632, pages: 604, language: 'арабча' },
+                { id: 2, title: 'Таджвид илими', author: 'М. Хусайн', category: 'quran', type: 'epub', cover: 'from-emerald-500 to-green-700', year: 2010, pages: 245, language: 'кыргызча' },
+                { id: 3, title: 'Математика 5', author: 'А. Айтматов', category: 'education', type: 'pdf', cover: 'from-blue-600 to-indigo-800', year: 2022, pages: 180, language: 'кыргызча' },
+                { id: 4, title: 'Физика 7', author: 'К. Эйнштейн', category: 'education', type: 'pdf', cover: 'from-purple-600 to-indigo-900', year: 2021, pages: 220, language: 'кыргызча' },
+                { id: 5, title: 'Манас', author: 'Сагымбай Орозбаков', category: 'literature', type: 'epub', cover: 'from-amber-600 to-orange-800', year: 1856, pages: 50000, language: 'кыргызча' },
+                { id: 6, title: 'Сейтек', author: 'Тологон Касымбеков', category: 'literature', type: 'pdf', cover: 'from-amber-500 to-yellow-700', year: 1954, pages: 380, language: 'кыргызча' },
+                { id: 7, title: 'Астрономия', author: 'С. Хокинг', category: 'science', type: 'epub', cover: 'from-slate-600 to-gray-800', year: 1988, pages: 256, language: 'орусча' },
+                { id: 8, title: 'Биология 9', author: 'Д. Дарвин', category: 'science', type: 'pdf', cover: 'from-green-600 to-emerald-800', year: 1859, pages: 502, language: 'орусча' },
+                { id: 9, title: 'Тарых 6', author: 'К. Тыныстанов', category: 'education', type: 'pdf', cover: 'from-red-600 to-rose-800', year: 2020, pages: 195, language: 'кыргызча' },
+                { id: 10, title: 'Алыкул', author: 'Алыкул Осмонов', category: 'literature', type: 'epub', cover: 'from-pink-600 to-rose-700', year: 1930, pages: 150, language: 'кыргызча' },
+                { id: 11, title: 'Химия 8', author: 'Д. Менделеев', category: 'science', type: 'pdf', cover: 'from-cyan-600 to-blue-800', year: 1869, pages: 312, language: 'орусча' },
+                { id: 12, title: 'География', author: 'А. Магеллан', category: 'education', type: 'epub', cover: 'from-teal-600 to-cyan-800', year: 2021, pages: 210, language: 'кыргызча' }
+            ],
+            schedule: [
+                { id: 1, day: 'Дүйшөмбү', class: '5', lessons: ['Математика', 'Кыргыз тили', 'Алгебра', 'Тарых', 'Физика', 'Английский'] },
+                { id: 2, day: 'Шейшемби', class: '5', lessons: ['Кыргыз адабияты', 'Биология', 'Химия', 'Математика', 'География', 'Дене тарбия'] },
+                { id: 3, day: 'Шаршемби', class: '5', lessons: ['Физика', 'Алгебра', 'Кыргыз тили', 'Тарых', 'Английский', 'Математика'] },
+                { id: 4, day: 'Бейшемби', class: '5', lessons: ['Биология', 'Химия', 'Кыргыз адабияты', 'География', 'Математика', 'Информатика'] },
+                { id: 5, day: 'Жума', class: '5', lessons: ['Математика', 'Физика', 'Кыргыз тили', 'Тарых', 'Дене тарбия', 'Английский'] },
+                { id: 6, day: 'Ишемби', class: '5', lessons: ['Алгебра', 'Биология', 'Кыргыз адабияты', 'География', 'Химия'] }
+            ],
+            homework: [
+                { id: 1, subject: 'Математика', task: '№45-48 көйгөйлөр', class: '5', deadline: '2026-06-10', status: 'pending', teacher: 'А. Айтматов' },
+                { id: 2, subject: 'Кыргыз адабияты', task: '"Манас" эпосу, 100 сөз', class: '5', deadline: '2026-06-12', status: 'pending', teacher: 'К. Тыныстанов' },
+                { id: 3, subject: 'Физика', task: 'Закон Ома, №15-20', class: '7', deadline: '2026-06-11', status: 'completed', teacher: 'К. Эйнштейн' },
+                { id: 4, subject: 'Химия', task: 'Менделеев таблицасы', class: '8', deadline: '2026-06-13', status: 'pending', teacher: 'Д. Менделеев' },
+                { id: 5, subject: 'Биология', task: 'Клетка түзүлүшү', class: '9', deadline: '2026-06-10', status: 'completed', teacher: 'Д. Дарвин' }
+            ],
+            grades: [
+                { id: 1, studentId: 1, studentName: 'Айбек Усманов', subject: 'Математика', grade: 5, date: '2026-06-01', teacher: 'А. Айтматов', class: '5' },
+                { id: 2, studentId: 1, studentName: 'Айбек Усманов', subject: 'Кыргыз тили', grade: 4, date: '2026-06-02', teacher: 'К. Тыныстанов', class: '5' },
+                { id: 3, studentId: 1, studentName: 'Айбек Усманов', subject: 'Физика', grade: 5, date: '2026-06-03', teacher: 'К. Эйнштейн', class: '5' },
+                { id: 4, studentId: 2, studentName: 'Айгүл Касымова', subject: 'Математика', grade: 4, date: '2026-06-01', teacher: 'А. Айтматов', class: '5' },
+                { id: 5, studentId: 2, studentName: 'Айгүл Касымова', subject: 'Кыргыз тили', grade: 5, date: '2026-06-02', teacher: 'К. Тыныстанов', class: '5' },
+                { id: 6, studentId: 3, studentName: 'Бекмурз Тыныстанов', subject: 'Математика', grade: 3, date: '2026-06-01', teacher: 'А. Айтматов', class: '5' },
+                { id: 7, studentId: 3, studentName: 'Бекмурз Тыныстанов', subject: 'Физика', grade: 4, date: '2026-06-03', teacher: 'К. Эйнштейн', class: '5' }
+            ],
+            settings: {
+                schoolName: '№5 Мектеп',
+                principal: 'С. Жусупов',
+                address: 'Бишкек ш., Манас пр. 45',
+                phone: '+996 312 45 67 89',
+                email: 'school5@edu.kg',
+                maxStudentsPerClass: 35,
+                gradingSystem: '5-баллдык',
+                academicYear: '2025-2026'
+            },
+            users: []
+        };
+
+        // Database Manager
+        var DB = {
+            init: function() {
+                if (!localStorage.getItem('zeerek_db_init')) {
+                    for (var key in DEFAULT_DATA) {
+                        localStorage.setItem('zeerek_' + key, JSON.stringify(DEFAULT_DATA[key]));
+                    }
+                    localStorage.setItem('zeerek_db_init', 'true');
+                    localStorage.setItem('zeerek_db_version', DB_VERSION);
+                    console.log('Database initialized v' + DB_VERSION);
+                }
+            },
+
+            get: function(store) {
+                var data = localStorage.getItem('zeerek_' + store);
+                return data ? JSON.parse(data) : null;
+            },
+
+            set: function(store, data) {
+                localStorage.setItem('zeerek_' + store, JSON.stringify(data));
+                return data;
+            },
+
+            add: function(store, item) {
+                var data = this.get(store) || [];
+                if (!item.id) item.id = Date.now();
+                if (!item.createdAt) item.createdAt = new Date().toISOString();
+                data.push(item);
+                this.set(store, data);
+                return item;
+            },
+
+            update: function(store, id, updates) {
+                var data = this.get(store) || [];
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].id === id) {
+                        for (var key in updates) {
+                            data[i][key] = updates[key];
+                        }
+                        data[i].updatedAt = new Date().toISOString();
+                        this.set(store, data);
+                        return data[i];
+                    }
+                }
+                return null;
+            },
+
+            delete: function(store, id) {
+                var data = this.get(store) || [];
+                var originalLength = data.length;
+                data = data.filter(function(item) { return item.id !== id; });
+                this.set(store, data);
+                return data.length < originalLength;
+            },
+
+            find: function(store, criteria) {
+                var data = this.get(store) || [];
+                return data.filter(function(item) {
+                    for (var key in criteria) {
+                        if (item[key] !== criteria[key]) return false;
+                    }
+                    return true;
+                });
+            },
+
+            search: function(store, query, fields) {
+                var data = this.get(store) || [];
+                var lowerQuery = query.toLowerCase();
+                return data.filter(function(item) {
+                    return fields.some(function(field) {
+                        var value = item[field];
+                        return value && value.toString().toLowerCase().includes(lowerQuery);
+                    });
+                });
+            },
+
+            getStats: function() {
+                var stats = {};
+                DB_STORES.forEach(function(store) {
+                    var data = DB.get(store);
+                    if (Array.isArray(data)) {
+                        stats[store] = data.length;
+                    } else if (data && typeof data === 'object') {
+                        stats[store] = Object.keys(data).length;
+                    } else {
+                        stats[store] = 0;
+                    }
+                });
+                return stats;
+            },
+
+            exportAll: function() {
+                var exportData = {
+                    version: DB_VERSION,
+                    exportedAt: new Date().toISOString(),
+                    data: {}
+                };
+                DB_STORES.forEach(function(store) {
+                    exportData.data[store] = DB.get(store);
+                });
+                return JSON.stringify(exportData, null, 2);
+            },
+
+            importAll: function(jsonString) {
+                try {
+                    var importData = JSON.parse(jsonString);
+                    if (importData.data) {
+                        for (var store in importData.data) {
+                            if (DB_STORES.includes(store)) {
+                                DB.set(store, importData.data[store]);
+                            }
+                        }
+                        return true;
+                    }
+                    return false;
+                } catch (e) {
+                    console.error('Import failed:', e);
+                    return false;
+                }
+            },
+
+            reset: function() {
+                DB_STORES.forEach(function(store) {
+                    localStorage.removeItem('zeerek_' + store);
+                });
+                localStorage.removeItem('zeerek_db_init');
+                localStorage.removeItem('zeerek_db_version');
+                localStorage.removeItem('zeerek_current_user');
+                this.init();
+                location.reload();
+            }
+        };
+
+        // Initialize database
+        DB.init();
+
+        // Current user
+        var currentUser = null;
+
+        function checkAuth() {
+            var savedUser = localStorage.getItem('zeerek_current_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUIForUser();
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // AUTH FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════
+        
+        function doRegister(event) {
+            event.preventDefault();
+            
+            var name = document.getElementById('regName').value.trim();
+            var email = document.getElementById('regEmail').value.trim().toLowerCase();
+            var password = document.getElementById('regPassword').value;
+            var confirmPassword = document.getElementById('regConfirmPassword').value;
+            var role = document.querySelector('input[name="role"]:checked').value;
+            var userClass = document.getElementById('regClass').value;
+
+            // Validation
+            if (!name || !email || !password) {
+                showNotification('Бардык талааларды толтуруңуз!', 'error');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                showNotification('Сырсөздөр дал келбейт!', 'error');
+                return false;
+            }
+
+            if (password.length < 6) {
+                showNotification('Сырсөз 6 белгиден узун болушу керек!', 'error');
+                return false;
+            }
+
+            // Check existing user
+            var users = DB.get('users') || [];
+            var existing = users.find(function(u) { return u.email === email; });
+            if (existing) {
+                showNotification('Бул email менен колдонуучу катталынган!', 'error');
+                return false;
+            }
+
+            // Create user
+            var newUser = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                role: role,
+                class: userClass,
+                avatar: null,
+                status: 'active',
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString()
+            };
+
+            // Save to database
+            DB.add('users', newUser);
+
+            // Set current user (without password)
+            currentUser = {
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email,
+                role: newUser.role,
+                class: newUser.class,
+                avatar: newUser.avatar,
+                status: newUser.status,
+                createdAt: newUser.createdAt,
+                lastLogin: newUser.lastLogin
+            };
+            localStorage.setItem('zeerek_current_user', JSON.stringify(currentUser));
+
+            showNotification('Ийгиликтүү катталдыңыз! Кош келдиңиз, ' + name + '!', 'success');
+            
+            // Close modal and reset form
+            closeAuthModal();
+            document.getElementById('registerForm').reset();
+            
+            // Update UI
+            updateUIForUser();
+            
+            return false;
+        }
+
+        function doLogin(event) {
+            event.preventDefault();
+            
+            var email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            var password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showNotification('Email жана сырсөздү толтуруңуз!', 'error');
+                return false;
+            }
+
+            var users = DB.get('users') || [];
+            var user = users.find(function(u) { return u.email === email && u.password === password; });
+
+            if (!user) {
+                showNotification('Email же сырсөз туура эмес!', 'error');
+                return false;
+            }
+
+            // Update last login
+            user.lastLogin = new Date().toISOString();
+            DB.set('users', users);
+
+            currentUser = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                class: user.class,
+                avatar: user.avatar,
+                status: user.status,
+                createdAt: user.createdAt,
+                lastLogin: user.lastLogin
+            };
+            localStorage.setItem('zeerek_current_user', JSON.stringify(currentUser));
+
+            showNotification('Кош келдиңиз, ' + user.name + '!', 'success');
+            
+            closeAuthModal();
+            document.getElementById('loginForm').reset();
+            updateUIForUser();
+            
+            return false;
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('zeerek_current_user');
+            updateUIForUser();
+            showNotification('Системадан чыктыңыз', 'info');
+            closeDashboard();
+            closeProfile();
+            closeAdminPanel();
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // UI UPDATE FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════
+        
+        function updateUIForUser() {
+            var userMenuText = document.getElementById('userMenuText');
+            var userName = document.getElementById('userName');
+            var userEmail = document.getElementById('userEmail');
+            var userRoleDisplay = document.getElementById('userRoleDisplay');
+            var userRoleBadgeNav = document.getElementById('userRoleBadgeNav');
+            var guestView = document.getElementById('guestView');
+            var loggedInView = document.getElementById('loggedInView');
+            var dashboardBtn = document.getElementById('dashboardBtn');
+            var adminBtn = document.getElementById('adminBtn');
+            var dropdownAdminBtn = document.getElementById('dropdownAdminBtn');
+            var mobileDashboardBtn = document.getElementById('mobileDashboardBtn');
+            var mobileAuthSection = document.getElementById('mobileAuthSection');
+            var mobileLoggedInSection = document.getElementById('mobileLoggedInSection');
+            var mobileUserName = document.getElementById('mobileUserName');
+            var mobileUserEmail = document.getElementById('mobileUserEmail');
+            var mobileUserRoleBadge = document.getElementById('mobileUserRoleBadge');
+            var heroWelcome = document.getElementById('heroWelcome');
+            var heroUserName = document.getElementById('heroUserName');
+            var heroRoleBadge = document.getElementById('heroRoleBadge');
+            var teacherSection = document.getElementById('teacherSection');
+            var studentSection = document.getElementById('studentSection');
+            var adminSection = document.getElementById('adminSection');
+            var roleBanner = document.getElementById('roleBanner');
+
+            if (currentUser) {
+                userMenuText.textContent = currentUser.name.split(' ')[0];
+                userName.textContent = currentUser.name;
+                userEmail.textContent = currentUser.email;
+                
+                var roleBadgeHTML = getRoleBadgeHTML(currentUser.role);
+                userRoleDisplay.innerHTML = roleBadgeHTML;
+                userRoleBadgeNav.innerHTML = roleBadgeHTML;
+                mobileUserRoleBadge.innerHTML = roleBadgeHTML;
+                
+                guestView.classList.add('hidden');
+                loggedInView.classList.remove('hidden');
+                
+                dashboardBtn.classList.remove('hidden');
+                mobileDashboardBtn.classList.remove('hidden');
+                
+                mobileAuthSection.classList.add('hidden');
+                mobileLoggedInSection.classList.remove('hidden');
+                mobileUserName.textContent = currentUser.name;
+                mobileUserEmail.textContent = currentUser.email;
+                
+                heroWelcome.classList.remove('hidden');
+                heroUserName.textContent = currentUser.name.split(' ')[0];
+                heroRoleBadge.innerHTML = roleBadgeHTML;
+                
+                // Admin buttons
+                if (currentUser.role === 'admin') {
+                    adminBtn.classList.remove('hidden');
+                    if (dropdownAdminBtn) dropdownAdminBtn.classList.remove('hidden');
+                    adminSection.classList.remove('hidden');
+                } else {
+                    adminBtn.classList.add('hidden');
+                    if (dropdownAdminBtn) dropdownAdminBtn.classList.add('hidden');
+                    adminSection.classList.add('hidden');
+                }
+                
+                // Role sections
+                if (currentUser.role === 'teacher') {
+                    teacherSection.classList.remove('hidden');
+                    studentSection.classList.add('hidden');
+                    showRoleBanner('teacher');
+                } else if (currentUser.role === 'student') {
+                    teacherSection.classList.add('hidden');
+                    studentSection.classList.remove('hidden');
+                    showRoleBanner('student');
+                } else if (currentUser.role === 'admin') {
+                    teacherSection.classList.add('hidden');
+                    studentSection.classList.add('hidden');
+                    showRoleBanner('admin');
+                }
+            } else {
+                userMenuText.textContent = 'Кирүү';
+                guestView.classList.remove('hidden');
+                loggedInView.classList.add('hidden');
+                dashboardBtn.classList.add('hidden');
+                adminBtn.classList.add('hidden');
+                if (dropdownAdminBtn) dropdownAdminBtn.classList.add('hidden');
+                mobileDashboardBtn.classList.add('hidden');
+                mobileAuthSection.classList.remove('hidden');
+                mobileLoggedInSection.classList.add('hidden');
+                heroWelcome.classList.add('hidden');
+                teacherSection.classList.add('hidden');
+                studentSection.classList.add('hidden');
+                adminSection.classList.add('hidden');
+                if (roleBanner) roleBanner.classList.add('hidden');
+            }
+        }
+
+        function getRoleBadgeHTML(role) {
+            if (role === 'teacher') {
+                return '<span class="role-badge role-teacher"><i class="fas fa-chalkboard-teacher"></i>Мугалим</span>';
+            } else if (role === 'student') {
+                return '<span class="role-badge role-student"><i class="fas fa-user-graduate"></i>Окуучу</span>';
+            } else if (role === 'admin') {
+                return '<span class="role-badge role-admin"><i class="fas fa-shield-alt"></i>Админ</span>';
+            }
+            return '';
+        }
+
+        function showRoleBanner(role) {
+            var banner = document.getElementById('roleBanner');
+            var content = document.getElementById('roleBannerContent');
+            
+            if (!banner || !content) return;
+            
+            banner.classList.remove('hidden');
+            
+            if (role === 'teacher') {
+                content.className = 'teacher-panel rounded-2xl p-4 flex items-center justify-between';
+                content.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center"><i class="fas fa-chalkboard-teacher text-amber-400"></i></div><div><p class="font-semibold">Мугалим режими</p><p class="text-sm text-white/60">Сизге окутуу куралдары жеткиликтүү</p></div></div><button onclick="showDashboard()" class="px-4 py-2 bg-amber-500/20 border border-amber-500/30 rounded-lg text-sm hover:bg-amber-500/30 transition-all"><i class="fas fa-th-large mr-2"></i>Панельге өтүү</button>';
+            } else if (role === 'student') {
+                content.className = 'student-panel rounded-2xl p-4 flex items-center justify-between';
+                content.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center"><i class="fas fa-user-graduate text-green-400"></i></div><div><p class="font-semibold">Окуучу режими</p><p class="text-sm text-white/60">Сизге окуу материалдары жеткиликтүү</p></div></div><button onclick="showDashboard()" class="px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-lg text-sm hover:bg-green-500/30 transition-all"><i class="fas fa-th-large mr-2"></i>Панельге өтүү</button>';
+            } else if (role === 'admin') {
+                content.className = 'admin-panel rounded-2xl p-4 flex items-center justify-between';
+                content.innerHTML = '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center"><i class="fas fa-shield-alt text-red-400"></i></div><div><p class="font-semibold">Админ режими</p><p class="text-sm text-white/60">Базаны башкаруу укугуңуз бар</p></div></div><button onclick="showAdminPanel()" class="px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-sm hover:bg-red-500/30 transition-all"><i class="fas fa-database mr-2"></i>База</button>';
+            }
+        }
+        // ═══════════════════════════════════════════════════════════════
+        // DASHBOARD & PROFILE
+        // ═══════════════════════════════════════════════════════════════
+        
+        function showDashboard() {
+            if (!currentUser) {
+                showAuthModal('login');
+                return;
+            }
+            
+            var modal = document.getElementById('dashboardModal');
+            var body = document.getElementById('dashboardBody');
+            var roleBadge = document.getElementById('dashboardRoleBadge');
+            
+            roleBadge.innerHTML = getRoleBadgeHTML(currentUser.role);
+            
+            var stats = DB.getStats();
+            
+            if (currentUser.role === 'teacher') {
+                body.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">' + stats.users + '</div><p class="text-sm text-white/60">Колдонуучулар</p></div><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">' + stats.classes + '</div><p class="text-sm text-white/60">Класстар</p></div><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">' + stats.books + '</div><p class="text-sm text-white/60">Китептер</p></div><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">' + stats.grades + '</div><p class="text-sm text-white/60">Баалар</p></div></div><div class="space-y-4"><h4 class="font-semibold text-lg">Менин класстарым</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="glass-card rounded-xl p-4 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center"><i class="fas fa-users text-blue-400"></i></div><div><p class="font-medium">5"А" класс</p><p class="text-sm text-white/60">28 окуучу</p></div></div><button class="px-3 py-1.5 bg-blue-500/20 rounded-lg text-sm hover:bg-blue-500/30 transition-all">Көрүү</button></div><div class="glass-card rounded-xl p-4 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center"><i class="fas fa-users text-purple-400"></i></div><div><p class="font-medium">7"Б" класс</p><p class="text-sm text-white/60">32 окуучу</p></div></div><button class="px-3 py-1.5 bg-purple-500/20 rounded-lg text-sm hover:bg-purple-500/30 transition-all">Көрүү</button></div></div><h4 class="font-semibold text-lg mt-6">Акыркы иш-аракеттер</h4><div class="space-y-2"><div class="glass-card rounded-xl p-3 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center"><i class="fas fa-file-alt text-amber-400 text-sm"></i></div><div class="flex-1"><p class="text-sm">Математика 5 - жаңы тапшырма жүктөлдү</p><p class="text-xs text-white/40">2 саат мурун</p></div></div></div></div>';
+            } else if (currentUser.role === 'admin') {
+                body.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">' + stats.users + '</div><p class="text-sm text-white/60">Колдонуучулар</p></div><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">' + stats.classes + '</div><p class="text-sm text-white/60">Класстар</p></div><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">' + stats.books + '</div><p class="text-sm text-white/60">Китептер</p></div><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">' + stats.homework + '</div><p class="text-sm text-white/60">Тапшырмалар</p></div></div><div class="space-y-4"><h4 class="font-semibold text-lg">Система статистикасы</h4><div class="glass-card rounded-xl p-4"><p class="text-sm text-white/60 mb-2">База версиясы: ' + DB_VERSION + '</p><p class="text-sm text-white/60 mb-2">Сактагычтар: ' + DB_STORES.join(', ') + '</p><p class="text-sm text-white/60 mb-2">Баалар жазуулар: ' + stats.grades + '</p><p class="text-sm text-white/60 mb-2">Сабактар графиги: ' + stats.schedule + ' күн</p><button onclick="showAdminPanel()" class="mt-3 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-sm hover:bg-red-500/30 transition-all text-red-300"><i class="fas fa-database mr-2"></i>Базаны башкаруу</button></div></div>';
+            } else {
+                body.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">8</div><p class="text-sm text-white/60">Активдүү сабактар</p></div><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">4.2</div><p class="text-sm text-white/60">Орточо баа</p></div><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">12</div><p class="text-sm text-white/60">Бүтүрүлгөн тапшырма</p></div><div class="glass-card rounded-xl p-4"><div class="text-3xl font-bold stat-number mb-1">3</div><p class="text-sm text-white/60">Күтүлүүчү тапшырма</p></div></div><div class="space-y-4"><h4 class="font-semibold text-lg">Менин классым</h4><div class="glass-card rounded-xl p-4"><div class="flex items-center gap-4"><div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"><i class="fas fa-graduation-cap text-2xl"></i></div><div><p class="font-semibold text-lg">' + (currentUser.class ? currentUser.class + '-класс' : 'Класс тандалган эмес') + '</p><p class="text-sm text-white/60">Класс жетекчи: А. Айтматов</p></div></div></div><h4 class="font-semibold text-lg mt-6">Акыркы баалар</h4><div class="space-y-2"><div class="glass-card rounded-xl p-3 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center"><i class="fas fa-calculator text-blue-400 text-sm"></i></div><span class="text-sm">Математика</span></div><span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm font-semibold">5</span></div><div class="glass-card rounded-xl p-3 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center"><i class="fas fa-flask text-purple-400 text-sm"></i></div><span class="text-sm">Физика</span></div><span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm font-semibold">4</span></div></div></div>';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeDashboard() {
+            document.getElementById('dashboardModal').classList.remove('active');
+        }
+
+        function showProfile() {
+            if (!currentUser) return;
+            
+            var modal = document.getElementById('profileModal');
+            var body = document.getElementById('profileBody');
+            
+            body.innerHTML = '<div class="text-center mb-6"><div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center mb-4 relative"><i class="fas fa-user text-4xl"></i><div class="absolute -bottom-2 -right-2">' + getRoleBadgeHTML(currentUser.role) + '</div></div><h3 class="text-xl font-bold">' + currentUser.name + '</h3><p class="text-white/60">' + currentUser.email + '</p></div><div class="space-y-4"><div class="glass-card rounded-xl p-4"><div class="flex justify-between items-center mb-2"><span class="text-sm text-white/60">Ролу</span>' + getRoleBadgeHTML(currentUser.role) + '</div><div class="flex justify-between items-center mb-2"><span class="text-sm text-white/60">Класс</span><span class="font-medium">' + (currentUser.class ? currentUser.class + '-класс' : 'Тандалган эмес') + '</span></div><div class="flex justify-between items-center mb-2"><span class="text-sm text-white/60">Статус</span><span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">' + (currentUser.status || 'active') + '</span></div><div class="flex justify-between items-center"><span class="text-sm text-white/60">Катталган</span><span class="font-medium">' + new Date(currentUser.createdAt).toLocaleDateString('ky-KG') + '</span></div></div><button onclick="logout()" class="w-full py-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 hover:bg-red-500/30 transition-all"><i class="fas fa-sign-out-alt mr-2"></i>Системадан чыгуу</button></div>';
+            
+            modal.classList.add('active');
+        }
+
+        function closeProfile() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // AUTH MODAL
+        // ═══════════════════════════════════════════════════════════════
+        
+        function showAuthModal(type) {
+            var modal = document.getElementById('authModal');
+            switchAuthTab(type);
+            modal.classList.add('active');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+            document.getElementById('loginForm').reset();
+            document.getElementById('registerForm').reset();
+        }
+
+        function switchAuthTab(type) {
+            var loginTab = document.getElementById('loginTab');
+            var registerTab = document.getElementById('registerTab');
+            var loginForm = document.getElementById('loginForm');
+            var registerForm = document.getElementById('registerForm');
+            var authTitle = document.getElementById('authTitle');
+            
+            if (type === 'login') {
+                loginTab.classList.add('bg-indigo-500', 'text-white');
+                loginTab.classList.remove('bg-white/10');
+                registerTab.classList.remove('bg-indigo-500', 'text-white');
+                registerTab.classList.add('bg-white/10');
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                authTitle.textContent = 'Кирүү';
+            } else {
+                registerTab.classList.add('bg-indigo-500', 'text-white');
+                registerTab.classList.remove('bg-white/10');
+                loginTab.classList.remove('bg-indigo-500', 'text-white');
+                loginTab.classList.add('bg-white/10');
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                authTitle.textContent = 'Катталуу';
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // ADMIN PANEL / JSON DATABASE
+        // ═══════════════════════════════════════════════════════════════
+        
+        function showAdminPanel() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                showNotification('Бул функция админ үчүн гана!', 'error');
+                return;
+            }
+            
+            var modal = document.getElementById('adminModal');
+            modal.classList.add('active');
+            switchDbTab('users');
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminModal').classList.remove('active');
+        }
+
+        function switchDbTab(tab) {
+            document.querySelectorAll('.db-tab').forEach(function(btn) {
+                btn.classList.remove('bg-indigo-500', 'text-white');
+                btn.classList.add('bg-white/10');
+            });
+            document.getElementById('dbTab-' + tab).classList.add('bg-indigo-500', 'text-white');
+            document.getElementById('dbTab-' + tab).classList.remove('bg-white/10');
+            
+            var content = document.getElementById('dbContent');
+            
+            if (tab === 'json') {
+                showJsonView(content);
+            } else if (tab === 'users') {
+                showUsersTable(content);
+            } else if (tab === 'classes') {
+                showClassesTable(content);
+            } else if (tab === 'books') {
+                showBooksTable(content);
+            } else if (tab === 'grades') {
+                showGradesTable(content);
+            } else if (tab === 'homework') {
+                showHomeworkTable(content);
+            } else if (tab === 'schedule') {
+                showScheduleTable(content);
+            }
+        }
+
+        function showJsonView(container) {
+            var allData = {};
+            DB_STORES.forEach(function(store) {
+                allData[store] = DB.get(store);
+            });
+            
+            var jsonStr = JSON.stringify(allData, null, 2);
+            var highlighted = syntaxHighlight(jsonStr);
+            
+            container.innerHTML = '<div class="mb-4 flex justify-between items-center"><h4 class="font-semibold">Толук JSON База</h4><button onclick="copyJsonToClipboard()" class="px-3 py-1.5 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-all"><i class="fas fa-copy mr-1"></i>Көчүрүү</button></div><div class="json-viewer rounded-xl p-4">' + highlighted + '</div>';
+        }
+
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+                var cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        function copyJsonToClipboard() {
+            var allData = {};
+            DB_STORES.forEach(function(store) {
+                allData[store] = DB.get(store);
+            });
+            var jsonStr = JSON.stringify(allData, null, 2);
+            navigator.clipboard.writeText(jsonStr).then(function() {
+                showNotification('JSON көчүрүлдү!', 'success');
+            });
+        }
+
+        function showUsersTable(container) {
+            var users = DB.get('users') || [];
+            var html = '<div class="mb-4 flex justify-between items-center"><h4 class="font-semibold">Колдонуучулар (' + users.length + ')</h4><button onclick="showAddUserForm()" class="px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg text-sm hover:bg-green-500/30 transition-all text-green-300"><i class="fas fa-plus mr-1"></i>Кошуу</button></div>';
+            
+            if (users.length === 0) {
+                html += '<div class="text-center py-8 text-white/60">Колдонуучулар жок. Катталуу аркылуу кошуңуз.</div>';
+            } else {
+                html += '<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-white/10"><th class="text-left py-2 px-3">ID</th><th class="text-left py-2 px-3">Аты</th><th class="text-left py-2 px-3">Email</th><th class="text-left py-2 px-3">Ролу</th><th class="text-left py-2 px-3">Класс</th><th class="text-left py-2 px-3">Катталган</th><th class="text-left py-2 px-3">Аркеттер</th></tr></thead><tbody>';
+                users.forEach(function(user) {
+                    html += '<tr class="table-row border-b border-white/5"><td class="py-2 px-3">' + user.id + '</td><td class="py-2 px-3">' + user.name + '</td><td class="py-2 px-3">' + user.email + '</td><td class="py-2 px-3">' + getRoleBadgeHTML(user.role) + '</td><td class="py-2 px-3">' + (user.class || '-') + '</td><td class="py-2 px-3">' + new Date(user.createdAt).toLocaleDateString() + '</td><td class="py-2 px-3"><button onclick="deleteUser(' + user.id + ')" class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button></td></tr>';
+                });
+                html += '</tbody></table></div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function showClassesTable(container) {
+            var classes = DB.get('classes') || [];
+            var html = '<div class="mb-4"><h4 class="font-semibold">Класстар (' + classes.length + ')</h4></div>';
+            html += '<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-white/10"><th class="text-left py-2 px-3">ID</th><th class="text-left py-2 px-3">Аталышы</th><th class="text-left py-2 px-3">Предметтер</th><th class="text-left py-2 px-3">Окуучулар</th><th class="text-left py-2 px-3">Мугалим</th></tr></thead><tbody>';
+            classes.forEach(function(cls) {
+                html += '<tr class="table-row border-b border-white/5"><td class="py-2 px-3">' + cls.id + '</td><td class="py-2 px-3">' + cls.name + '</td><td class="py-2 px-3">' + cls.subjects + '</td><td class="py-2 px-3">' + cls.students + '</td><td class="py-2 px-3">' + cls.teacher + '</td></tr>';
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function showBooksTable(container) {
+            var books = DB.get('books') || [];
+            var html = '<div class="mb-4"><h4 class="font-semibold">Китептер (' + books.length + ')</h4></div>';
+            html += '<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-white/10"><th class="text-left py-2 px-3">ID</th><th class="text-left py-2 px-3">Аталышы</th><th class="text-left py-2 px-3">Автор</th><th class="text-left py-2 px-3">Категория</th><th class="text-left py-2 px-3">Тип</th><th class="text-left py-2 px-3">Беттер</th><th class="text-left py-2 px-3">Жылы</th></tr></thead><tbody>';
+            books.forEach(function(book) {
+                html += '<tr class="table-row border-b border-white/5"><td class="py-2 px-3">' + book.id + '</td><td class="py-2 px-3">' + book.title + '</td><td class="py-2 px-3">' + book.author + '</td><td class="py-2 px-3">' + book.category + '</td><td class="py-2 px-3">' + book.type + '</td><td class="py-2 px-3">' + book.pages + '</td><td class="py-2 px-3">' + book.year + '</td></tr>';
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function showGradesTable(container) {
+            var grades = DB.get('grades') || [];
+            var html = '<div class="mb-4"><h4 class="font-semibold">Баалар (' + grades.length + ')</h4></div>';
+            html += '<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-white/10"><th class="text-left py-2 px-3">ID</th><th class="text-left py-2 px-3">Окуучу</th><th class="text-left py-2 px-3">Предмет</th><th class="text-left py-2 px-3">Баа</th><th class="text-left py-2 px-3">Класс</th><th class="text-left py-2 px-3">Датасы</th></tr></thead><tbody>';
+            grades.forEach(function(grade) {
+                var gradeColor = grade.grade >= 4 ? 'text-green-400' : (grade.grade >= 3 ? 'text-yellow-400' : 'text-red-400');
+                html += '<tr class="table-row border-b border-white/5"><td class="py-2 px-3">' + grade.id + '</td><td class="py-2 px-3">' + grade.studentName + '</td><td class="py-2 px-3">' + grade.subject + '</td><td class="py-2 px-3 ' + gradeColor + ' font-bold">' + grade.grade + '</td><td class="py-2 px-3">' + grade.class + '</td><td class="py-2 px-3">' + new Date(grade.date).toLocaleDateString() + '</td></tr>';
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function showHomeworkTable(container) {
+            var homework = DB.get('homework') || [];
+            var html = '<div class="mb-4"><h4 class="font-semibold">Үй тапшырмалар (' + homework.length + ')</h4></div>';
+            html += '<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-white/10"><th class="text-left py-2 px-3">ID</th><th class="text-left py-2 px-3">Предмет</th><th class="text-left py-2 px-3">Тапшырма</th><th class="text-left py-2 px-3">Класс</th><th class="text-left py-2 px-3">Мөөнөт</th><th class="text-left py-2 px-3">Статус</th></tr></thead><tbody>';
+            homework.forEach(function(hw) {
+                var statusBadge = hw.status === 'completed' ? '<span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Бүттү</span>' : '<span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs">Күтүлүүдө</span>';
+                html += '<tr class="table-row border-b border-white/5"><td class="py-2 px-3">' + hw.id + '</td><td class="py-2 px-3">' + hw.subject + '</td><td class="py-2 px-3">' + hw.task + '</td><td class="py-2 px-3">' + hw.class + '</td><td class="py-2 px-3">' + hw.deadline + '</td><td class="py-2 px-3">' + statusBadge + '</td></tr>';
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function showScheduleTable(container) {
+            var schedule = DB.get('schedule') || [];
+            var html = '<div class="mb-4"><h4 class="font-semibold">Сабактар графиги</h4></div>';
+            html += '<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-white/10"><th class="text-left py-2 px-3">Күнү</th><th class="text-left py-2 px-3">Класс</th><th class="text-left py-2 px-3">Сабактар</th></tr></thead><tbody>';
+            schedule.forEach(function(day) {
+                html += '<tr class="table-row border-b border-white/5"><td class="py-2 px-3 font-semibold">' + day.day + '</td><td class="py-2 px-3">' + day.class + '-класс</td><td class="py-2 px-3">' + day.lessons.join(', ') + '</td></tr>';
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Бул колдонуучуну чын эле жок кылгыңыз келеби?')) {
+                DB.delete('users', userId);
+                showNotification('Колдонуучу жок кылынды', 'info');
+                switchDbTab('users');
+            }
+        }
+
+        function showAddUserForm() {
+            var name = prompt('Аты-жөнү:');
+            var email = prompt('Email:');
+            var password = prompt('Сырсөз:');
+            var role = prompt('Роль (student/teacher/admin):', 'student');
+            
+            if (name && email && password) {
+                var newUser = {
+                    id: Date.now(),
+                    name: name,
+                    email: email,
+                    password: password,
+                    role: role,
+                    class: '',
+                    status: 'active',
+                    createdAt: new Date().toISOString()
+                };
+                DB.add('users', newUser);
+                showNotification('Колдонуучу кошулду!', 'success');
+                switchDbTab('users');
+            }
+        }
+
+        function exportAllData() {
+            var data = DB.exportAll();
+            var blob = new Blob([data], { type: 'application/json' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'zeerek_database_' + new Date().toISOString().split('T')[0] + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('База экспортталды!', 'success');
+        }
+
+        function importDataPrompt() {
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    if (DB.importAll(event.target.result)) {
+                        showNotification('База импортталды!', 'success');
+                        switchDbTab('users');
+                    } else {
+                        showNotification('Импорт ишке ашкан жок!', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // TOOLS & NOTIFICATIONS
+        // ═══════════════════════════════════════════════════════════════
+        
+        function showTeacherTool(tool) {
+            var tools = {
+                lessons: 'Сабак пландары - бул жерде сабактарды пландаштыруу жана түзүү функциясы болот',
+                grades: 'Баалар журналы - окуучулардын бааларын киргизүү жана көзөмөлдөө',
+                materials: 'Материалдар - окуу материалдарын жүктөө жана бөлүшүү'
+            };
+            showNotification(tools[tool] || 'Функция иштелип жатат', 'info');
+        }
+
+        function showStudentTool(tool) {
+            var tools = {
+                homework: 'Үй тапшырма - аткарылуучу тапшырмалар тизмеси',
+                progress: 'Ийгиликтерим - баалар жана жетишкендиктер тарыхы',
+                schedule: 'Сабактар графиги - күнүмдүк окуу планы'
+            };
+            showNotification(tools[tool] || 'Функция иштелип жатат', 'info');
+        }
+
+        function showNotification(message, type) {
+            var notif = document.getElementById('notification');
+            var icon = document.getElementById('notifIcon');
+            var title = document.getElementById('notifTitle');
+            var msg = document.getElementById('notifMessage');
+            
+            var icons = {
+                success: '<i class="fas fa-check text-white"></i>',
+                error: '<i class="fas fa-exclamation text-white"></i>',
+                info: '<i class="fas fa-info text-white"></i>'
+            };
+            
+            var colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+            
+            var titles = {
+                success: 'Ийгилик!',
+                error: 'Ката!',
+                info: 'Маалымат'
+            };
+            
+            icon.className = 'w-8 h-8 rounded-full flex items-center justify-center ' + colors[type];
+            icon.innerHTML = icons[type];
+            title.textContent = titles[type];
+            msg.textContent = message;
+            
+            notif.classList.add('show');
+            
+            setTimeout(function() {
+                notif.classList.remove('show');
+            }, 3000);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // UI FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════
+        
+        function toggleSearch() {
+            var input = document.getElementById('searchInput');
+            input.classList.toggle('active');
+            if (input.classList.contains('active')) input.focus();
+        }
+
+        function toggleMap() {
+            var modal = document.getElementById('mapModal');
+            modal.classList.toggle('active');
+            if (modal.classList.contains('active')) {
+                initMap();
+            }
+        }
+
+        function toggleUserMenu() {
+            var dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('opacity-0');
+            dropdown.classList.toggle('invisible');
+            dropdown.classList.toggle('translate-y-2');
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('translate-x-full');
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#userMenu')) {
+                var dropdown = document.getElementById('userDropdown');
+                dropdown.classList.add('opacity-0', 'invisible', 'translate-y-2');
+            }
+        });
+
+        window.addEventListener('scroll', function() {
+            var navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('glass-dark');
+            } else {
+                navbar.classList.remove('glass-dark');
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // ORIGINAL FUNCTIONS (Classes, Books, Map)
+        // ═══════════════════════════════════════════════════════════════
+        
+        function initParticles() {
+            var container = document.getElementById('particles');
+            for (var i = 0; i < 20; i++) {
+                var particle = document.createElement('div');
+                particle.className = 'particle';
+                var size = Math.random() * 100 + 50;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        function renderConveyor() {
+            var track = document.getElementById('conveyor');
+            var classes = DB.get('classes') || DEFAULT_DATA.classes;
+            var duplicated = [];
+            for (var i = 0; i < 4; i++) {
+                duplicated = duplicated.concat(classes);
+            }
+            
+            track.innerHTML = duplicated.map(function(cls) {
+                return '<div class="class-card flex-shrink-0 w-64 glass rounded-2xl p-6 cursor-pointer group" onclick="selectClass(' + cls.id + ')"><div class="w-14 h-14 rounded-xl bg-gradient-to-br ' + cls.color + ' flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform"><i class="fas ' + cls.icon + ' text-2xl text-white"></i></div><h3 class="text-xl font-bold mb-1">' + cls.name + '</h3><p class="text-white/60 text-sm">' + cls.subjects + ' предмет | ' + cls.students + ' окуучу</p><div class="mt-4 flex items-center gap-2 text-xs text-white/40"><i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i><span>Көрүү</span></div></div>';
+            }).join('');
+        }
+
+        var isPaused = false;
+        function pauseConveyor() {
+            var track = document.querySelector('.conveyor-track');
+            var btn = document.getElementById('pauseBtn');
+            isPaused = !isPaused;
+            track.style.animationPlayState = isPaused ? 'paused' : 'running';
+            btn.innerHTML = isPaused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+        }
+
+        function selectClass(id) {
+            var classes = DB.get('classes') || DEFAULT_DATA.classes;
+            var cls = classes.find(function(c) { return c.id === id; });
+            alert(cls.name + ' тандалды!\\n\\nПредметтер: ' + cls.subjects + '\\nОкуучулар: ' + cls.students + '\\nМугалим: ' + cls.teacher);
+        }
+
+        function renderBooks(category, searchTerm) {
+            var grid = document.getElementById('booksGrid');
+            var empty = document.getElementById('emptyState');
+            
+            var books = DB.get('books') || DEFAULT_DATA.books;
+            
+            if (category !== 'all') {
+                books = books.filter(function(b) { return b.category === category; });
+            }
+            if (searchTerm) {
+                var lowerTerm = searchTerm.toLowerCase();
+                books = books.filter(function(b) { 
+                    return b.title.toLowerCase().includes(lowerTerm) || b.author.toLowerCase().includes(lowerTerm);
+                });
+            }
+
+            if (books.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            grid.innerHTML = books.map(function(book) {
+                return '<div class="book-card group cursor-pointer" onclick="openBook(' + book.id + ')"><div class="book-3d"><div class="book-inner relative aspect-[3/4] rounded-xl bg-gradient-to-br ' + book.cover + ' p-4 flex flex-col justify-between shadow-lg overflow-hidden"><div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div><div class="relative z-10"><div class="text-xs uppercase tracking-wider text-white/70 mb-1">' + book.category + '</div><h3 class="font-bold text-lg leading-tight">' + book.title + '</h3><p class="text-sm text-white/70 mt-1">' + book.author + '</p><p class="text-xs text-white/50 mt-1">' + book.year + ' | ' + book.pages + ' бет</p></div><div class="relative z-10 flex items-center justify-between"><span class="px-2 py-1 bg-white/20 rounded text-xs uppercase">' + book.type + '</span><i class="fas fa-download opacity-0 group-hover:opacity-100 transition-opacity"></i></div><div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div></div></div></div>';
+            }).join('');
+        }
+
+        function filterBooks(category) {
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                if (btn.dataset.category === category) {
+                    btn.classList.add('bg-indigo-500', 'text-white');
+                    btn.classList.remove('bg-white/10');
+                } else {
+                    btn.classList.remove('bg-indigo-500', 'text-white');
+                    btn.classList.add('bg-white/10');
+                }
+            });
+            
+            var searchTerm = document.getElementById('bookSearch').value;
+            renderBooks(category, searchTerm);
+        }
+
+        function searchBooks(term) {
+            var activeCategory = document.querySelector('.tab-btn.bg-indigo-500').dataset.category;
+            renderBooks(activeCategory, term);
+        }
+
+        function openBook(id) {
+            var books = DB.get('books') || DEFAULT_DATA.books;
+            var book = books.find(function(b) { return b.id === id; });
+            alert('"' + book.title + '" китеби ачылууда...\\n\\nАвтор: ' + book.author + '\\nКатегория: ' + book.category + '\\nФормат: ' + book.type.toUpperCase() + '\\nЖылы: ' + book.year + '\\nБеттер: ' + book.pages + '\\nТил: ' + book.language);
+        }
+
+        function initMap() {
+            var canvas = document.getElementById('mapCanvas');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            var locations = [
+                { x: 0.3, y: 0.3, type: 'school', name: 'Мектеп №1' },
+                { x: 0.6, y: 0.4, type: 'school', name: 'Мектеп №5' },
+                { x: 0.4, y: 0.6, type: 'library', name: 'Борбордук китепкана' },
+                { x: 0.7, y: 0.5, type: 'school', name: 'Лицей' },
+                { x: 0.5, y: 0.3, type: 'library', name: 'Илимий китепкана' },
+                { x: 0.2, y: 0.5, type: 'school', name: 'Гимназия' },
+                { x: 0.8, y: 0.3, type: 'library', name: 'Бала багы' }
+            ];
+
+            var time = 0;
+
+            function draw() {
+                if (!document.getElementById('mapModal').classList.contains('active')) return;
+                
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                ctx.lineWidth = 1;
+                for (var i = 0; i < canvas.width; i += 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, canvas.height);
+                    ctx.stroke();
+                }
+                for (var i = 0; i < canvas.height; i += 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(canvas.width, i);
+                    ctx.stroke();
+                }
+
+                locations.forEach(function(loc) {
+                    var x = loc.x * canvas.width;
+                    var y = loc.y * canvas.height;
+                    var color = loc.type === 'school' ? '#6366f1' : '#a855f7';
+                    
+                    var pulse = Math.sin(time * 0.05) * 5 + 10;
+                    ctx.beginPath();
+                    ctx.arc(x, y, pulse, 0, Math.PI * 2);
+                    ctx.fillStyle = color + '30';
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, 6, 0, Math.PI * 2);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+
+                    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                    ctx.font = '12px Inter';
+                    ctx.fillText(loc.name, x + 12, y + 4);
+                });
+
+                time++;
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        window.addEventListener('resize', function() {
+            var canvas = document.getElementById('mapCanvas');
+            if (canvas) {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // INITIALIZATION
+        // ═══════════════════════════════════════════════════════════════
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initParticles();
+            renderConveyor();
+            renderBooks('all', '');
+            initMap();
+            checkAuth();
+            
+            console.log('╔══════════════════════════════════════╗');
+            console.log('║   Zeerek JSON Database System v' + DB_VERSION + '  ║');
+            console.log('╠══════════════════════════════════════╣');
+            console.log('║  База иштей баштады!                 ║');
+            console.log('║  Сактагычтар: ' + DB_STORES.join(', ') + '  ║');
+            console.log('╚══════════════════════════════════════╝');
+        });
+    </script>
+</body>
+</html>
+
